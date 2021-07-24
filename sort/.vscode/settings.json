@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "array": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "ranges": "c",
+        "utility": "c",
+        "cstdlib": "cpp",
+        "random": "c",
+        "mergesort.h": "c"
+    }
+}
