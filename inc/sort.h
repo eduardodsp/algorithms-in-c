@@ -1,13 +1,14 @@
-#ifndef _MERGESORT_H_
-#define _MERGESORT_H_
-
 /**
- * @file    mergesort.h
+ * @file    sort.h
  * @authors Eduardo S. Pino (edsp)
  * @version 1.0
  * @date    24-07-2021
  *
  */
+
+#ifndef _SORT_H_
+#define _SORT_H_
+
 #include <stdint.h>
 
 /**
@@ -18,5 +19,15 @@
  * @param r last index of array to be sorted
  */
 void mergesort(int* arr,int p,int r);
+
+/**
+ * @brief Recursively sort an array in ascending order with Θ(nlogn) time complexity
+ *        using a heap data structure
+ * 
+ * @param a pointer to array to be sorted
+ * @param n size of the array to be sorted
+ */
+void heapsort(int* a, int n);
+
 
 #endif
