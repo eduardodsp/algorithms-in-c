@@ -30,4 +30,12 @@ void mergesort(int* arr,int p,int r);
 void heapsort(int* a, int n);
 
 
+/**
+ * @brief Recursively sort an array in ascending order with 
+ *        average time complexity Θ(nlogn) and worst case of Θ(n²)
+ * 
+ * @param p first index of array to be sorted
+ * @param r last index of array to be sorted
+ */
+void quicksort(int* a, int p, int r);
 #endif
