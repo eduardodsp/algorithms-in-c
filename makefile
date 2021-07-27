@@ -7,7 +7,7 @@ OBJ=$(C_SOURCE:.c=.o)
 CC=gcc
 
 # Flags for compiler
-CC_FLAGS= -Wall
+CC_FLAGS= -Wall -lm
 
 # Compilation and linking
 all: $(PROJ_NAME)
