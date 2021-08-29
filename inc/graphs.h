@@ -81,7 +81,7 @@ void print_graph(graph_t* g);
  */
 typedef struct bftree_s
 {
-     int* dist;   /* Array of distance from root note*/
+     int* dist;   /* Array of distance from root node*/
      int* parent; /* Array of parent nodes. Each index is a node and the key is its parent node. Root node has parent -1*/
 
 }bftree_t;

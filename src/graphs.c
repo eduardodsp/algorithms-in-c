@@ -1,3 +1,11 @@
+/**
+ * @file    graphs.c
+ * @authors Eduardo S. Pino (edsp)
+ * @version 1.0
+ * @date    15-08-2021
+ *
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -138,7 +146,7 @@ void print_graph(graph_t* g)
  */
 bftree_t* bfs(graph_t* g, int root)
 {
-    unsigned char visited[g->nv];
+    bool visited[g->nv];
     int u;
     struct node* tmp;
     queue_t q;
@@ -152,11 +160,11 @@ bftree_t* bfs(graph_t* g, int root)
     {
         bftree->dist[j] = INT_MAX;
         bftree->parent[j] = -1;
-        visited[j] = 0;
+        visited[j] = false;
     }
 
     queue(&q,g->nv);
-    visited[root] = 1;
+    visited[root] = true;
     bftree->dist[root] = 0;
 
     enqueue(&q,root);
@@ -166,9 +174,9 @@ bftree_t* bfs(graph_t* g, int root)
         tmp = g->adj[u];
         while(tmp)
         {
-            if(!visited[tmp->v])
+            if(visited[tmp->v] == false)
             {
-                visited[tmp->v] = 1;
+                visited[tmp->v] = true;
                 bftree->dist[tmp->v] = bftree->dist[u] + 1;
                 bftree->parent[tmp->v] = u;
                 enqueue(&q,tmp->v);

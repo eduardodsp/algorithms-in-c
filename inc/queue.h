@@ -1,3 +1,13 @@
+/**
+ * @file    queue.h
+ * @authors Eduardo S. Pino (edsp)
+ * @version 1.0
+ * @date    15-08-2021
+ *
+ */
+#ifndef _QUEUE_H_
+#define _QUEUE_H_
+
 #include <stdlib.h>
 
 
@@ -68,3 +78,5 @@ void dequeue(queue_t* q, int* out)
 
 
 }
+
+#endif
