@@ -3,6 +3,7 @@
 #include "inc/sort.h"
 #include "inc/matrix.h"
 #include "inc/majority.h"
+#include "inc/graphs.h"
 
 #define NO_TEST             0
 #define MERGESORT_TEST      1
@@ -11,8 +12,9 @@
 
 #define DETERMINANT_TEST    4 
 #define MAJORITY_TEST       5
+#define GRAPH_TEST          6
 
-#define TEST MAJORITY_TEST
+#define TEST GRAPH_TEST
 
 void print_array(int* arr, int size)
 {
@@ -56,6 +58,18 @@ int main ()
         printf("%d is the majority\n", major);
 #endif
 
+#if (TEST == GRAPH_TEST)
+    graph_t* graph = create_graph(5, true);
+    add_edge(graph, 0, 1, 1);
+    add_edge(graph, 0, 2, 1);
+    add_edge(graph, 1, 2, 1);
+    add_edge(graph, 2, 3, 1);
+    add_edge(graph, 3, 4, 1);
+
+    shortest_path_bfs(graph, 0, 4);
+
+    destroy_graph(graph);
+#endif
 
     return 0;
 }
