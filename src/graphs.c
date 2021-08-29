@@ -216,7 +216,7 @@ void print_path_bftree(bftree_t* bftree, int src , int dst)
 }
 
 /**
- * @brief Prints the path between two nodes in a graph
+ * @brief Prints the shortest path between two nodes in a graph
  * 
  * @param g pointer to graph
  * @param src source node

@@ -96,6 +96,13 @@ typedef struct bftree_s
  */
 bftree_t* bfs(graph_t* g, int root);
 
+/**
+ * @brief Prints the shortest path between two nodes in a graph
+ * 
+ * @param g pointer to graph
+ * @param src source node
+ * @param dst destination node
+ */
 void shortest_path_bfs(graph_t* g, int src , int dst);
 
 #endif
