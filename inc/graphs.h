@@ -10,6 +10,15 @@
 
 #include <stdbool.h>
 
+
+#define DIRECTED true
+#define UNDIRECTED false
+
+#define USE_BFS             0
+#define USE_DIJKSTRA        1
+#define USE_BELLMAN_FORD    2
+
+
 /**
  * @brief Adjacency list node
  * 
@@ -75,26 +84,48 @@ void print_graph(graph_t* g);
 
 
 /**
- * @brief Breadth-First Tree representation 
- * using one array for parent nodes and another for distance from root node.
+ * @brief Single-Source Shortest Path structure
+ * that contains information about shortest path from one vertex to all other vertices on a graph
  * 
  */
-typedef struct bftree_s
+typedef struct sssp_s
 {
-     int* dist;   /* Array of distance from root node*/
-     int* parent; /* Array of parent nodes. Each index is a node and the key is its parent node. Root node has parent -1*/
+     int* cost;   /* Array of cost, or distance, from source node*/
+     int* prev;   /* Array of previous nodes. Each index is a node and the key is its 
+                     previous node on the path. Root node has parent -1*/
 
-}bftree_t;
+}sssp_t;
+
+/**
+ * @brief Solves single source shortest path problem on an unweighted directed graph
+ * 
+ * @param g pointer to graph
+ * @param src source node
+ * @return sssp_t* 
+ */
+sssp_t* bfs(graph_t* g, int src);
 
 
 /**
- * @brief Build a breadth-first tree from a graph
+ * @brief Finds the shortest path from node src to node dst in a positively weighted directed graph
+ * using Dijkstras algorithm
  * 
  * @param g pointer to graph
- * @param root root of the tree
- * @return bftree_t* 
+ * @param src source node
+ * @return sssp_t* 
  */
-bftree_t* bfs(graph_t* g, int root);
+sssp_t* dijkstra(graph_t* g, int src);
+
+
+/**
+ * @brief Finds the shortest path from node src to node dst in a weighted directed graph
+ * using Bellman-Ford's algorithm
+ * 
+ * @param g pointer to graph
+ * @param src source node
+ * @return An sssp object if no negative cycles are found, NULL if a negative cycle is found 
+ */
+sssp_t* bellman_ford(graph_t* g, int src);
 
 /**
  * @brief Prints the shortest path between two nodes in a graph
@@ -102,7 +133,9 @@ bftree_t* bfs(graph_t* g, int root);
  * @param g pointer to graph
  * @param src source node
  * @param dst destination node
- */
-void shortest_path_bfs(graph_t* g, int src , int dst);
+ * @param algo algorithm to use. Options: USE_BFS (only unweighted graphs), USE_DIJKSTRA, USE_BELLMAN_FORD
 
+ * @return TRUE if successful, FALSE if failed
+ */
+bool shortest_path(graph_t* g, int src , int dst, int algo);
 #endif

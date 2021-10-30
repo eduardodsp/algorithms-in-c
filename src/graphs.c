@@ -12,6 +12,7 @@
 #include <limits.h>
 #include "../inc/graphs.h"
 #include "../inc/queue.h"
+#include "../inc/heap.h"
 
 /**
  * @brief Create a graph object
@@ -138,36 +139,36 @@ void print_graph(graph_t* g)
 }
 
 /**
- * @brief Build a breadth-first tree from a graph
+ * @brief Solves single source shortest path problem on an unweighted directed graph
  * 
  * @param g pointer to graph
- * @param root root of the tree
- * @return bftree_t* 
+ * @param src source node
+ * @return sssp_t* 
  */
-bftree_t* bfs(graph_t* g, int root)
+sssp_t* bfs(graph_t* g, int src)
 {
     bool visited[g->nv];
     int u;
     struct node* tmp;
     queue_t q;
 
-    bftree_t* bftree = malloc(sizeof(bftree_t));
+    sssp_t* sssp = malloc(sizeof(sssp_t));
 
-    bftree->dist = (int*)malloc(g->nv * sizeof(int));
-    bftree->parent = (int*)malloc(g->nv * sizeof(int));
+    sssp->cost = (int*)malloc(g->nv * sizeof(int));
+    sssp->prev = (int*)malloc(g->nv * sizeof(int));
 
     for(int j=0; j < g->nv; j++)
     {
-        bftree->dist[j] = INT_MAX;
-        bftree->parent[j] = -1;
+        sssp->cost[j] = INT_MAX;
+        sssp->prev[j] = -1;
         visited[j] = false;
     }
 
     queue(&q,g->nv);
-    visited[root] = true;
-    bftree->dist[root] = 0;
+    visited[src] = true;
+    sssp->cost[src] = 0;
 
-    enqueue(&q,root);
+    enqueue(&q,src);
     while(q.ctr)
     {
         dequeue(&q,&u);
@@ -177,8 +178,8 @@ bftree_t* bfs(graph_t* g, int root)
             if(visited[tmp->v] == false)
             {
                 visited[tmp->v] = true;
-                bftree->dist[tmp->v] = bftree->dist[u] + 1;
-                bftree->parent[tmp->v] = u;
+                sssp->cost[tmp->v] = sssp->cost[u] + 1;
+                sssp->prev[tmp->v] = u;
                 enqueue(&q,tmp->v);
             }
             tmp = tmp->next;
@@ -186,17 +187,17 @@ bftree_t* bfs(graph_t* g, int root)
 
     }
     queue_delete(&q);
-    return bftree;
+    return sssp;
 }
 /**
- * @brief Prints the path between two nodes in a Breadth-First tree
+ * @brief Prints the path between two nodes in a single source shortest path array
  * 
- * @param g pointer to bftree
+ * @param g pointer to single source shortest path structure
  * @param src source node
  * @param dst destination node
  */
 static
-void print_path_bftree(bftree_t* bftree, int src , int dst)
+void print_shortest_path(sssp_t* sssp, int src , int dst)
 {
     static int n = 0;
     n++;
@@ -206,14 +207,14 @@ void print_path_bftree(bftree_t* bftree, int src , int dst)
         n--;
     } 
 
-    else if (bftree->parent[dst] == -1)
+    else if (sssp->prev[dst] == -1)
     {   
         printf("no path from %d to %d \n", src, dst);
         return;
     }
     else
     {
-        print_path_bftree(bftree, src, bftree->parent[dst]);
+        print_shortest_path(sssp, src, sssp->prev[dst]);
         n--;
         if(n)
            printf("%d -> ", dst);
@@ -223,15 +224,170 @@ void print_path_bftree(bftree_t* bftree, int src , int dst)
 
 }
 
+
+/**
+ * @brief Finds the shortest path from node src to node dst in a positively weighted directed graph
+ * using Dijkstras algorithm
+ * 
+ * @param g pointer to graph
+ * @param src source node
+ * @return sssp_t* 
+ */
+sssp_t* dijkstra(graph_t* g, int src)
+{
+    heap_t* heap;
+    key_value_t item;
+    struct node* tmp;
+    int u,i;
+
+    sssp_t* sssp = malloc(sizeof(sssp_t));
+
+    sssp->cost = (int*)malloc(g->nv * sizeof(int));
+    sssp->prev = (int*)malloc(g->nv * sizeof(int));
+
+    for(int j=0; j < g->nv; j++)
+    {
+        sssp->cost[j] = INT_MAX;
+        sssp->prev[j] = -1;
+    }
+    sssp->cost[src] = 0;
+
+    heap = min_heap(g->nv);    
+    for(int j=0; j < g->nv; j++)
+    {
+        min_insert(heap, j, sssp->cost[j]);
+    }
+
+    while(heap->ctr != 0)
+    {
+        if(extract_min(heap, &item) == 0)
+        {
+            return NULL;
+        }
+        u = item.key;
+        tmp = g->adj[u];
+
+        //for each vertex v ∈ G.Adj[u]
+        while(tmp)
+        {
+            //relax
+            if(sssp->cost[u] + tmp->w < sssp->cost[tmp->v])
+            {
+                sssp->cost[tmp->v] = sssp->cost[u] + tmp->w ;
+                sssp->prev[tmp->v] = u;
+                min_decrease_key(heap, tmp->v,sssp->cost[tmp->v]);
+            }
+
+            tmp = tmp->next;
+        }
+    }
+
+    return sssp;
+}
+
+
+/**
+ * @brief Finds the shortest path from node src to node dst in a weighted directed graph
+ * using Bellman-Ford's algorithm
+ * 
+ * @param g pointer to graph
+ * @param src source node
+ * @return An sssp object if no negative cycles are found, NULL if a negative cycle is found 
+ */
+sssp_t* bellman_ford(graph_t* g, int src)
+{
+    struct node* tmp;
+    sssp_t* sssp = malloc(sizeof(sssp_t));
+    sssp->cost = (int*)malloc(g->nv * sizeof(int));
+    sssp->prev = (int*)malloc(g->nv * sizeof(int));
+
+    for(int j=0; j < g->nv; j++)
+    {
+        sssp->cost[j] = INT_MAX;
+        sssp->prev[j] = -1;
+    }
+
+    sssp->cost[src] = 0;
+
+
+    for(int i=0; i < g->nv; i++)
+    {
+
+        //foreach (u,v) ∈ E
+        for(int u = 0; u < g->nv; u++)
+        {
+            tmp = g->adj[u];
+            while(tmp)
+            {
+                //relax
+                if(sssp->cost[u] + tmp->w < sssp->cost[tmp->v])
+                {
+                    sssp->cost[tmp->v] = sssp->cost[u] + tmp->w ;
+                    sssp->prev[tmp->v] = u;
+                }
+
+                tmp = tmp->next;
+            }
+        }
+    }
+
+    //foreach (u,v) ∈ E
+    for(int u = 0; u < g->nv; u++)
+    {
+        tmp = g->adj[u];
+        while(tmp)
+        {
+            //relax
+            if(sssp->cost[u] + tmp->w < sssp->cost[tmp->v])
+            {
+                free(sssp->cost);
+                free(sssp->prev);
+                free(sssp);
+
+                return NULL;
+            }
+
+            tmp = tmp->next;
+        }
+    }
+
+    return sssp;
+}
+
+
 /**
  * @brief Prints the shortest path between two nodes in a graph
  * 
  * @param g pointer to graph
  * @param src source node
  * @param dst destination node
+ * @param algo algorithm to use. Options: USE_BFS (only unweighted graphs), USE_DIJKSTRA, USE_BELLMAN_FORD
+
+ * @return TRUE if successful, FALSE if failed
  */
-void shortest_path_bfs(graph_t* g, int src , int dst)
+bool shortest_path(graph_t* g, int src , int dst, int algo)
 {
-    bftree_t* bftree = bfs(g, src);
-    print_path_bftree(bftree, src, dst);
+    sssp_t* sssp = NULL;
+
+    switch(algo)
+    {
+        case USE_BFS:
+            sssp = bfs(g, src);
+        break;
+
+        case USE_BELLMAN_FORD:
+            sssp = bellman_ford(g, src);
+
+        break;
+        
+        case USE_DIJKSTRA:
+            sssp = dijkstra(g, src);
+        break;
+    }
+
+    if(sssp == NULL)
+        return false;
+        
+    print_shortest_path(sssp, src, dst);
+    return true;
 }

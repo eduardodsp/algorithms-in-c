@@ -4,6 +4,7 @@
 #include "inc/matrix.h"
 #include "inc/majority.h"
 #include "inc/graphs.h"
+#include "inc/heap.h"
 
 #define NO_TEST             0
 #define MERGESORT_TEST      1
@@ -59,15 +60,18 @@ int main ()
 #endif
 
 #if (TEST == GRAPH_TEST)
-    graph_t* graph = create_graph(5, true);
+    graph_t* graph = create_graph(5, DIRECTED);
     add_edge(graph, 0, 1, 1);
-    add_edge(graph, 0, 2, 1);
-    add_edge(graph, 1, 2, 1);
-    add_edge(graph, 2, 3, 1);
-    add_edge(graph, 3, 4, 1);
+    add_edge(graph, 0, 2, 4);
+    add_edge(graph, 1, 2, 6);
+    add_edge(graph, 2, 3, 5);
+    add_edge(graph, 3, 4, 2);
 
-    shortest_path_bfs(graph, 0, 4);
-
+    if (shortest_path(graph, 0, 4, USE_DIJKSTRA) == false) //USE_BELLMAN_FORD USE_DIJKSTRA
+    {
+        printf("failed to find shortest path \n");
+    }
+    
     destroy_graph(graph);
 #endif
 
